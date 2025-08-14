@@ -1,0 +1,462 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Configuration Editor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        .player-list, .map-list, .side-list {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .player-entry, .map-entry, .side-entry {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            padding: 5px 10px;
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Match Configuration Editor</h1>
+    <form id="matchForm" onsubmit="event.preventDefault(); saveConfig();">
+        <div class="section">
+            <label for="matchid">Match ID:</label>
+            <input type="number" id="matchid" name="matchid" value="1" required>
+        </div>
+
+        <div class="section">
+            <h2>Team 1</h2>
+            <label for="team1_name">Team Name:</label>
+            <input type="text" id="team1_name" name="team1_name" value="Team 1" required>
+            <h3>Players</h3>
+            <div id="team1_players" class="player-list">
+                <div class="player-entry">
+                    <input type="text" name="team1_players_player_id[]" value="76561197990682262" placeholder="Steam ID" required>
+                    <input type="text" name="team1_players_player_name[]" value="Xyp9x" placeholder="Player Name" required>
+                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
+                </div>
+                <div class="player-entry">
+                    <input type="text" name="team1_players_player_id[]" value="76561198010511021" placeholder="Steam ID" required>
+                    <input type="text" name="team1_players_player_name[]" value="gla1ve" placeholder="Player Name" required>
+                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
+                </div>
+                <div class="player-entry">
+                    <input type="text" name="team1_players_player_id[]" value="76561197979669175" placeholder="Steam ID" required>
+                    <input type="text" name="team1_players_player_name[]" value="K0nfig" placeholder="Player Name" required>
+                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
+                </div>
+                <div class="player-entry">
+                    <input type="text" name="team1_players_player_id[]" value="76561198028458803" placeholder="Steam ID" required>
+                    <input type="text" name="team1_players_player_name[]" value="BlameF" placeholder="Player Name" required>
+                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
+                </div>
+                <div class="player-entry">
+                    <input type="text" name="team1_players_player_id[]" value="76561198024248129" placeholder="Steam ID" required>
+                    <input type="text" name="team1_players_player_name[]" value="farlig" placeholder="Player Name" required>
+                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
+                </div>
+            </div>
+            <button type="button" onclick="addPlayer('team1_players')">Add Player</button>
+        </div>
+
+        <div class="section">
+            <h2>Team 2</h2>
+            <label for="team2_name">Team Name:</label>
+            <input type="text" id="team2_name" name="team2_name" value="Team 2" required>
+            <h3>Players</h3>
+            <div id="team2_players" class="player-list">
+                <div class="player-entry">
+                    <input type="text" name="team2_players_player_id[]" value="76561198034202275" placeholder="Steam ID" required>
+                    <input type="text" name="team2_players_player_name[]" value="s1mple" placeholder="Player Name" required>
+                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
+                </div>
+                <div class="player-entry">
+                    <input type="text" name="team2_players_player_id[]" value="76561198044045107" placeholder="Steam ID" required>
+                    <input type="text" name="team2_players_player_name[]" value="electronic" placeholder="Player Name" required>
+                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
+                </div>
+                <div class="player-entry">
+                    <input type="text" name="team2_players_player_id[]" value="76561198246607476" placeholder="Steam ID" required>
+                    <input type="text" name="team2_players_player_name[]" value="b1t" placeholder="Player Name" required>
+                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
+                </div>
+                <div class="player-entry">
+                    <input type="text" name="team2_players_player_id[]" value="76561198121220486" placeholder="Steam ID" required>
+                    <input type="text" name="team2_players_player_name[]" value="Perfecto" placeholder="Player Name" required>
+                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
+                </div>
+                <div class="player-entry">
+                    <input type="text" name="team2_players_player_id[]" value="76561198040577200" placeholder="Steam ID" required>
+                    <input type="text" name="team2_players_player_name[]" value="sdy" placeholder="Player Name" required>
+                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
+                </div>
+            </div>
+            <button type="button" onclick="addPlayer('team2_players')">Add Player</button>
+        </div>
+
+        <div class="section">
+            <label for="num_maps">Number of Maps:</label>
+            <select id="num_maps" name="num_maps" onchange="updateMapList()">
+                <option value="1">1</option>
+                <option value="3" selected>3</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+
+        <div class="section">
+            <h3>Map List</h3>
+            <div id="map_list" class="map-list">
+                <div class="map-entry">
+                    <select name="maplist[]" required>
+                        <option value="de_dust2">de_dust2</option>
+                        <option value="de_mirage" selected>de_mirage</option>
+                        <option value="de_inferno">de_inferno</option>
+                        <option value="de_ancient">de_ancient</option>
+                        <option value="de_nuke">de_nuke</option>
+                        <option value="de_train">de_train</option>
+                        <option value="de_overpass">de_overpass</option>
+                    </select>
+                    <button type="button" class="remove-btn" onclick="removeMap(this)">Remove Map</button>
+                </div>
+                <div class="map-entry">
+                    <select name="maplist[]" required>
+                        <option value="de_dust2">de_dust2</option>
+                        <option value="de_mirage">de_mirage</option>
+                        <option value="de_inferno">de_inferno</option>
+                        <option value="de_ancient">de_ancient</option>
+                        <option value="de_nuke">de_nuke</option>
+                        <option value="de_train">de_train</option>
+                        <option value="de_overpass" selected>de_overpass</option>
+                    </select>
+                    <button type="button" class="remove-btn" onclick="removeMap(this)">Remove Map</button>
+                </div>
+                <div class="map-entry">
+                    <select name="maplist[]" required>
+                        <option value="de_dust2">de_dust2</option>
+                        <option value="de_mirage">de_mirage</option>
+                        <option value="de_inferno" selected>de_inferno</option>
+                        <option value="de_ancient">de_ancient</option>
+                        <option value="de_nuke">de_nuke</option>
+                        <option value="de_train">de_train</option>
+                        <option value="de_overpass">de_overpass</option>
+                    </select>
+                    <button type="button" class="remove-btn" onclick="removeMap(this)">Remove Map</button>
+                </div>
+            </div>
+            <button type="button" onclick="addMap()">Add Map</button>
+            <button type="button" onclick="randomizeMaps()">Randomize Maps</button>
+        </div>
+
+        <div class="section">
+            <h3>Add Custom Map</h3>
+            <input type="text" id="new_map" placeholder="Enter new map name (e.g., de_custom)" required>
+            <button type="button" onclick="addCustomMap()">Add Custom Map</button>
+        </div>
+
+        <div class="section">
+            <h3>Map Sides</h3>
+            <div id="map_sides" class="side-list">
+                <div class="side-entry">
+                    <input type="text" name="map_sides[]" value="team1_ct" required>
+                </div>
+                <div class="side-entry">
+                    <input type="text" name="map_sides[]" value="team2_ct" required>
+                </div>
+                <div class="side-entry">
+                    <input type="text" name="map_sides[]" value="knife" required>
+                </div>
+            </div>
+            <button type="button" onclick="addSide()">Add Side</button>
+        </div>
+
+        <div class="section">
+            <h3>Spectators</h3>
+            <div id="spectators" class="player-list">
+            </div>
+            <button type="button" onclick="addPlayer('spectators')">Add Spectator</button>
+        </div>
+
+        <div class="section">
+            <label for="clinch_series">Clinch Series:</label>
+            <select id="clinch_series" name="clinch_series">
+                <option value="true" selected>True</option>
+                <option value="false">False</option>
+            </select>
+        </div>
+
+        <div class="section">
+            <label for="players_per_team">Players per Team:</label>
+            <input type="number" id="players_per_team" name="players_per_team" value="5" required>
+        </div>
+
+        <div class="section">
+            <h3>CVars</h3>
+            <label for="hostname">Hostname:</label>
+            <input type="text" id="hostname" name="hostname" value="MatchZy: tjaY Test" required>
+            <label for="mp_friendlyfire">Friendly Fire:</label>
+            <select id="mp_friendlyfire" name="mp_friendlyfire">
+                <option value="0" selected>OFF</option>
+                <option value="1">ON</option>
+            </select>
+        </div>
+
+        <button type="submit">Save Configuration</button>
+    </form>
+
+    <script>
+        let mapOptions = localStorage.getItem('customMapOptions') ? JSON.parse(localStorage.getItem('customMapOptions')) : ["de_dust2", "de_mirage", "de_inferno", "de_ancient", "de_nuke", "de_train", "de_overpass"];
+
+        function addPlayer(containerId) {
+            const container = document.getElementById(containerId);
+            const isSpectator = containerId === 'spectators';
+            const placeholderName = isSpectator ? 'Spectator Name' : 'Player Name';
+            const removeText = isSpectator ? 'Remove Spectator' : 'Remove Player';
+            const entry = document.createElement('div');
+            entry.className = 'player-entry';
+            entry.innerHTML = `
+                <input type="text" name="${containerId}_player_id[]" placeholder="Steam ID" required>
+                <input type="text" name="${containerId}_player_name[]" placeholder="${placeholderName}" required>
+                <button type="button" class="remove-btn" onclick="removePlayer(this)">${removeText}</button>
+            `;
+            container.appendChild(entry);
+        }
+
+        function removePlayer(button) {
+            const entry = button.parentElement;
+            const container = entry.parentElement;
+            if (container.id === 'spectators' || container.children.length > 1) {
+                entry.remove();
+            } else {
+                alert('At least one player is required.');
+            }
+        }
+
+        function addMap() {
+            const container = document.getElementById('map_list');
+            const numMaps = parseInt(document.getElementById('num_maps').value);
+            if (container.children.length >= numMaps) {
+                alert(`Cannot add more maps. Maximum is ${numMaps}.`);
+                return;
+            }
+            const position = container.children.length;
+            const defaultMap = mapOptions[position % mapOptions.length];
+            const entry = document.createElement('div');
+            entry.className = 'map-entry';
+            entry.innerHTML = `
+                <select name="maplist[]" required>
+                    ${mapOptions.map(opt => `<option value="${opt}" ${opt === defaultMap ? 'selected' : ''}>${opt}</option>`).join('')}
+                </select>
+                <button type="button" class="remove-btn" onclick="removeMap(this)">Remove Map</button>
+            `;
+            container.appendChild(entry);
+        }
+
+        function removeMap(button) {
+            const entry = button.parentElement;
+            const container = entry.parentElement;
+            if (container.children.length > 1) {
+                entry.remove();
+            } else {
+                alert('At least one map is required.');
+            }
+        }
+
+        function updateMapList() {
+            const container = document.getElementById('map_list');
+            const numMaps = parseInt(document.getElementById('num_maps').value);
+            const currentMaps = Array.from(container.getElementsByTagName('select')).map(select => select.value);
+
+            // Remove all current map entries
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+
+            // Add new map entries up to numMaps
+            for (let i = 0; i < numMaps; i++) {
+                const selectedMap = currentMaps[i] || mapOptions[i % mapOptions.length];
+                const entry = document.createElement('div');
+                entry.className = 'map-entry';
+                entry.innerHTML = `
+                    <select name="maplist[]" required>
+                        ${mapOptions.map(opt => `<option value="${opt}" ${opt === selectedMap ? 'selected' : ''}>${opt}</option>`).join('')}
+                    </select>
+                    <button type="button" class="remove-btn" onclick="removeMap(this)">Remove Map</button>
+                `;
+                container.appendChild(entry);
+            }
+        }
+
+        function randomizeMaps() {
+            const container = document.getElementById('map_list');
+            const selects = container.getElementsByTagName('select');
+            let shuffled = [...mapOptions].sort(() => 0.5 - Math.random());
+            shuffled = shuffled.slice(0, selects.length);
+            for (let i = 0; i < selects.length; i++) {
+                selects[i].value = shuffled[i];
+            }
+        }
+
+        function addCustomMap() {
+            const newMapInput = document.getElementById('new_map');
+            const newMap = newMapInput.value.trim();
+            if (newMap && !mapOptions.includes(newMap)) {
+                mapOptions.push(newMap);
+                localStorage.setItem('customMapOptions', JSON.stringify(mapOptions));
+                updateMapList(); // Update the map list to reflect the new options
+                newMapInput.value = '';
+                alert('Map added successfully!');
+            } else {
+                alert('Map already exists or invalid input.');
+            }
+        }
+
+        function addSide() {
+            const container = document.getElementById('map_sides');
+            const entry = document.createElement('div');
+            entry.className = 'side-entry';
+            entry.innerHTML = `<input type="text" name="map_sides[]" placeholder="Map Side" required>`;
+            container.appendChild(entry);
+        }
+
+        function saveConfig() {
+            const form = document.getElementById('matchForm');
+            const formData = new FormData(form);
+            const config = {
+                matchid: parseInt(formData.get('matchid')),
+                team1: {
+                    name: formData.get('team1_name'),
+                    players: {}
+                },
+                team2: {
+                    name: formData.get('team2_name'),
+                    players: {}
+                },
+                num_maps: parseInt(formData.get('num_maps')),
+                maplist: formData.getAll('maplist[]'),
+                map_sides: formData.getAll('map_sides[]'),
+                spectators: {
+                    players: {}
+                },
+                clinch_series: formData.get('clinch_series') === 'true',
+                players_per_team: parseInt(formData.get('players_per_team')),
+                cvars: {
+                    hostname: formData.get('hostname'),
+                    mp_friendlyfire: formData.get('mp_friendlyfire')
+                }
+            };
+
+            const team1PlayerIds = formData.getAll('team1_players_player_id[]');
+            const team1PlayerNames = formData.getAll('team1_players_player_name[]');
+            team1PlayerIds.forEach((id, index) => {
+                if (id && team1PlayerNames[index]) {
+                    config.team1.players[id] = team1PlayerNames[index];
+                }
+            });
+
+            const team2PlayerIds = formData.getAll('team2_players_player_id[]');
+            const team2PlayerNames = formData.getAll('team2_players_player_name[]');
+            team2PlayerIds.forEach((id, index) => {
+                if (id && team2PlayerNames[index]) {
+                    config.team2.players[id] = team2PlayerNames[index];
+                }
+            });
+
+            const spectatorIds = formData.getAll('spectators_player_id[]');
+            const spectatorNames = formData.getAll('spectators_player_name[]');
+            spectatorIds.forEach((id, index) => {
+                if (id && spectatorNames[index]) {
+                    config.spectators.players[id] = spectatorNames[index];
+                }
+            });
+
+            const jsonString = JSON.stringify(config, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'match_config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize map list on page load
+        document.addEventListener('DOMContentLoaded', updateMapList);
+    </script>
+</body>
+</html>
