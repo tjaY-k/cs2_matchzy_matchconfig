@@ -106,31 +106,6 @@
             <input type="text" id="team1_name" name="team1_name" value="Team 1" required>
             <h3>Players</h3>
             <div id="team1_players" class="player-list">
-                <div class="player-entry">
-                    <input type="text" name="team1_players_player_id[]" value="76561197990682262" placeholder="Steam ID" required>
-                    <input type="text" name="team1_players_player_name[]" value="Xyp9x" placeholder="Player Name" required>
-                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
-                </div>
-                <div class="player-entry">
-                    <input type="text" name="team1_players_player_id[]" value="76561198010511021" placeholder="Steam ID" required>
-                    <input type="text" name="team1_players_player_name[]" value="gla1ve" placeholder="Player Name" required>
-                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
-                </div>
-                <div class="player-entry">
-                    <input type="text" name="team1_players_player_id[]" value="76561197979669175" placeholder="Steam ID" required>
-                    <input type="text" name="team1_players_player_name[]" value="K0nfig" placeholder="Player Name" required>
-                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
-                </div>
-                <div class="player-entry">
-                    <input type="text" name="team1_players_player_id[]" value="76561198028458803" placeholder="Steam ID" required>
-                    <input type="text" name="team1_players_player_name[]" value="BlameF" placeholder="Player Name" required>
-                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
-                </div>
-                <div class="player-entry">
-                    <input type="text" name="team1_players_player_id[]" value="76561198024248129" placeholder="Steam ID" required>
-                    <input type="text" name="team1_players_player_name[]" value="farlig" placeholder="Player Name" required>
-                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
-                </div>
             </div>
             <button type="button" onclick="addPlayer('team1_players')">Add Player</button>
         </div>
@@ -141,31 +116,6 @@
             <input type="text" id="team2_name" name="team2_name" value="Team 2" required>
             <h3>Players</h3>
             <div id="team2_players" class="player-list">
-                <div class="player-entry">
-                    <input type="text" name="team2_players_player_id[]" value="76561198034202275" placeholder="Steam ID" required>
-                    <input type="text" name="team2_players_player_name[]" value="s1mple" placeholder="Player Name" required>
-                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
-                </div>
-                <div class="player-entry">
-                    <input type="text" name="team2_players_player_id[]" value="76561198044045107" placeholder="Steam ID" required>
-                    <input type="text" name="team2_players_player_name[]" value="electronic" placeholder="Player Name" required>
-                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
-                </div>
-                <div class="player-entry">
-                    <input type="text" name="team2_players_player_id[]" value="76561198246607476" placeholder="Steam ID" required>
-                    <input type="text" name="team2_players_player_name[]" value="b1t" placeholder="Player Name" required>
-                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
-                </div>
-                <div class="player-entry">
-                    <input type="text" name="team2_players_player_id[]" value="76561198121220486" placeholder="Steam ID" required>
-                    <input type="text" name="team2_players_player_name[]" value="Perfecto" placeholder="Player Name" required>
-                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
-                </div>
-                <div class="player-entry">
-                    <input type="text" name="team2_players_player_id[]" value="76561198040577200" placeholder="Steam ID" required>
-                    <input type="text" name="team2_players_player_name[]" value="sdy" placeholder="Player Name" required>
-                    <button type="button" class="remove-btn" onclick="removePlayer(this)">Remove Player</button>
-                </div>
             </div>
             <button type="button" onclick="addPlayer('team2_players')">Add Player</button>
         </div>
@@ -224,12 +174,6 @@
         </div>
 
         <div class="section">
-            <h3>Add Custom Map</h3>
-            <input type="text" id="new_map" placeholder="Enter new map name (e.g., de_custom)" required>
-            <button type="button" onclick="addCustomMap()">Add Custom Map</button>
-        </div>
-
-        <div class="section">
             <h3>Map Sides</h3>
             <div id="map_sides" class="side-list">
                 <div class="side-entry">
@@ -280,7 +224,30 @@
     </form>
 
     <script>
-        let mapOptions = localStorage.getItem('customMapOptions') ? JSON.parse(localStorage.getItem('customMapOptions')) : ["de_dust2", "de_mirage", "de_inferno", "de_ancient", "de_nuke", "de_train", "de_overpass"];
+        const mapOptions = ["de_dust2", "de_mirage", "de_inferno", "de_ancient", "de_nuke", "de_train", "de_overpass"];
+        const playerOptions = [
+            { name: "Куф", steamId: "76561198157452555" },
+            { name: "Миша", steamId: "76561198267532174" },
+            { name: "Рома", steamId: "76561199224708548" },
+            { name: "Корела", steamId: "76561198123793731" },
+            { name: "Рыж", steamId: "76561198189503206" },
+            { name: "Леха", steamId: "76561197996688201" },
+            { name: "Костя", steamId: "76561197981127887" },
+            { name: "Федя", steamId: "76561198015424528" },
+            { name: "Сэф", steamId: "76561198014902438" },
+            { name: "Коля", steamId: "76561198872377804" },
+            { name: "Ваня", steamId: "76561199218838148" },
+            { name: "Ткач", steamId: "76561198977943165" },
+            { name: "Алег", steamId: "76561198219187840" },
+            { name: "Тема", steamId: "76561198188701537" },
+            { name: "Мара", steamId: "76561198164642940" },
+            { name: "Олег", steamId: "76561198176068026" },
+            { name: "Сиба", steamId: "76561199209010587" },
+            { name: "Кока", steamId: "76561199547347559" },
+            { name: "Ида", steamId: "76561198016724589" },
+            { name: "Никита", steamId: "76561198222164860" },
+            { name: "Нос", steamId: "76561198214505285" }
+        ];
 
         function addPlayer(containerId) {
             const container = document.getElementById(containerId);
@@ -290,11 +257,21 @@
             const entry = document.createElement('div');
             entry.className = 'player-entry';
             entry.innerHTML = `
-                <input type="text" name="${containerId}_player_id[]" placeholder="Steam ID" required>
-                <input type="text" name="${containerId}_player_name[]" placeholder="${placeholderName}" required>
+                <select name="${containerId}_player_name[]" onchange="updateSteamId(this)" required>
+                    <option value="" disabled selected>Select ${placeholderName}</option>
+                    ${playerOptions.map(player => `<option value="${player.name}">${player.name}</option>`).join('')}
+                </select>
+                <input type="text" name="${containerId}_player_id[]" placeholder="Steam ID" readonly>
                 <button type="button" class="remove-btn" onclick="removePlayer(this)">${removeText}</button>
             `;
             container.appendChild(entry);
+        }
+
+        function updateSteamId(select) {
+            const selectedName = select.value;
+            const steamIdInput = select.nextElementSibling;
+            const player = playerOptions.find(p => p.name === selectedName);
+            steamIdInput.value = player ? player.steamId : '';
         }
 
         function removePlayer(button) {
@@ -369,20 +346,6 @@
             shuffled = shuffled.slice(0, selects.length);
             for (let i = 0; i < selects.length; i++) {
                 selects[i].value = shuffled[i];
-            }
-        }
-
-        function addCustomMap() {
-            const newMapInput = document.getElementById('new_map');
-            const newMap = newMapInput.value.trim();
-            if (newMap && !mapOptions.includes(newMap)) {
-                mapOptions.push(newMap);
-                localStorage.setItem('customMapOptions', JSON.stringify(mapOptions));
-                updateMapList(); // Update the map list to reflect the new options
-                newMapInput.value = '';
-                alert('Map added successfully!');
-            } else {
-                alert('Map already exists or invalid input.');
             }
         }
 
