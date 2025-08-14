@@ -1,0 +1,1 @@
+# cs2_matchzy_matchconfig
