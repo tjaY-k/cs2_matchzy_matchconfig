@@ -220,6 +220,12 @@
             </select>
         </div>
 
+        <div class="section">
+            <h3>Save Options</h3>
+            <label><input type="radio" name="save_option" value="local" checked> Download Locally</label>
+            <label><input type="radio" name="save_option" value="server"> Upload to Server and Get Link</label>
+        </div>
+
         <button type="submit">Save Configuration</button>
     </form>
 
@@ -229,7 +235,7 @@
             { name: "Куф", steamId: "76561198157452555" },
             { name: "Миша", steamId: "76561198267532174" },
             { name: "Рома", steamId: "76561199224708548" },
-            { name: "Корела", steamId: "76561199209010587" },
+            { name: "Корела", steamId: "76561198123793731" },
             { name: "Рыж", steamId: "76561198189503206" },
             { name: "Леха", steamId: "76561197996688201" },
             { name: "Костя", steamId: "76561197981127887" },
@@ -357,24 +363,94 @@
             container.appendChild(entry);
         }
 
-        function saveConfig() {
+        function getConfig() {
             const form = document.getElementById('matchForm');
             const formData = new FormData(form);
-            fetch('/api/generate', {
-              method: 'POST',
-              body: formData
-            }).then(response => response.json())
-              .then(data => {
-                if (data.url) {
-                  alert(`JSON saved: ${data.url}`);
-                  // Optionally, open the URL or provide a link
-                } else if (data.error) {
-                  alert(`Error: ${data.error}`);
+            const config = {
+                matchid: parseInt(formData.get('matchid')),
+                team1: {
+                    name: formData.get('team1_name'),
+                    players: {}
+                },
+                team2: {
+                    name: formData.get('team2_name'),
+                    players: {}
+                },
+                num_maps: parseInt(formData.get('num_maps')),
+                maplist: formData.getAll('maplist[]'),
+                map_sides: formData.getAll('map_sides[]'),
+                spectators: {
+                    players: {}
+                },
+                clinch_series: formData.get('clinch_series') === 'true',
+                players_per_team: parseInt(formData.get('players_per_team')),
+                cvars: {
+                    hostname: formData.get('hostname'),
+                    mp_friendlyfire: formData.get('mp_friendlyfire')
                 }
-              }).catch(error => {
-                console.error('Error:', error);
-                alert('Failed to save configuration');
-              });
+            };
+
+            const team1PlayerIds = formData.getAll('team1_players_player_id[]');
+            const team1PlayerNames = formData.getAll('team1_players_player_name[]');
+            team1PlayerIds.forEach((id, index) => {
+                if (id && team1PlayerNames[index]) {
+                    config.team1.players[id] = team1PlayerNames[index];
+                }
+            });
+
+            const team2PlayerIds = formData.getAll('team2_players_player_id[]');
+            const team2PlayerNames = formData.getAll('team2_players_player_name[]');
+            team2PlayerIds.forEach((id, index) => {
+                if (id && team2PlayerNames[index]) {
+                    config.team2.players[id] = team2PlayerNames[index];
+                }
+            });
+
+            const spectatorIds = formData.getAll('spectators_player_id[]');
+            const spectatorNames = formData.getAll('spectators_player_name[]');
+            spectatorIds.forEach((id, index) => {
+                if (id && spectatorNames[index]) {
+                    config.spectators.players[id] = spectatorNames[index];
+                }
+            });
+
+            return config;
+        }
+
+        function saveConfig() {
+            const saveOption = document.querySelector('input[name="save_option"]:checked').value;
+            const config = getConfig();
+            const jsonString = JSON.stringify(config, null, 2);
+
+            if (saveOption === 'local') {
+                // Download locally
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'match_config.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            } else if (saveOption === 'server') {
+                // Upload to server
+                fetch('/api/generate', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: jsonString
+                }).then(response => response.json())
+                  .then(data => {
+                    if (data.url) {
+                      alert(`JSON uploaded: ${data.url}`);
+                    } else if (data.error) {
+                      alert(`Error: ${data.error}`);
+                    }
+                  }).catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to upload configuration');
+                  });
+            }
         }
 
         // Initialize map list on page load
