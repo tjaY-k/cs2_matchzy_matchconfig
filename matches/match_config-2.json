@@ -1,0 +1,33 @@
+{
+  "matchid": 1,
+  "team1": {
+    "name": "Team 1",
+    "players": {
+      "76561198157452555": "Куф"
+    }
+  },
+  "team2": {
+    "name": "Team 2",
+    "players": {
+      "76561197981127887": "Костя"
+    }
+  },
+  "num_maps": 1,
+  "maplist": [
+    "de_dust2"
+  ],
+  "map_sides": [
+    "team1_ct",
+    "team2_ct",
+    "knife"
+  ],
+  "spectators": {
+    "players": {}
+  },
+  "clinch_series": true,
+  "players_per_team": 1,
+  "cvars": {
+    "hostname": "MatchZy: tjaY Test",
+    "mp_friendlyfire": "0"
+  }
+}
